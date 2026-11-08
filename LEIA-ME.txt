@@ -1,10 +1,11 @@
-Quotes Editor 0.5.0
+PicSey 0.6.1
 
 Estrutura
   index.html              página principal
   css/style.css           estilos e fontes
   js/                     scripts em ordem numérica (versao.js guarda a versão e o histórico de mudanças)
   fonts/                  fontes do PicSay (licença em OFL.txt)
+  img/                    imagem da tela inicial
   icons/                  ícones do app (icon-1024.png é o ícone principal)
   manifest.webmanifest    dados para instalar na Tela de Início
 

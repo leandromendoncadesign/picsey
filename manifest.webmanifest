@@ -1,6 +1,6 @@
 {
-  "name": "Quotes Editor",
-  "short_name": "Quotes Editor",
+  "name": "PicSey",
+  "short_name": "PicSey",
   "start_url": "./index.html",
   "display": "standalone",
   "orientation": "portrait",
