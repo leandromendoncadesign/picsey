@@ -1,8 +1,8 @@
 'use strict';
 /* ---------- janelas ---------- */
 function modal(title,body){const m=h('div',{class:'modal',onclick:e=>{if(e.target===m)close()}},h('div',{class:'dlg',role:'dialog','aria-label':title},h('div',{class:'dh'},h('strong',{},title),h('button',{class:'ghost',onclick:()=>close()},'Fechar')),h('div',{class:'db'},body)));
-  function close(){m.remove();fontPickerRefresh=null}document.body.append(m);return close}
-function showChangelog(){modal('Histórico de mudanças',h('div',{class:'chlog'},CHANGELOG.map(c=>h('div',{},h('h4',{},'Versão '+c.v+' · '+c.d),h('ul',{},c.t.map(t=>h('li',{},t)))))))}
+  function close(){if(m.classList.contains('out'))return;fontPickerRefresh=null;m.classList.add('out');setTimeout(()=>m.remove(),200)}document.body.append(m);return close}
+function showChangelog(){modal('Histórico de mudanças',h('div',{class:'chlog'},CHANGELOG.map(c=>h('div',{},h('h4',{},'Versão '+c.v+' · '+c.d+(c.h?' às '+c.h:'')),h('ul',{},c.t.map(t=>h('li',{},t)))))))}
 async function doExport(){
   try{let k=Math.min(1,(exp.max||1e9)/Math.max(doc.w,doc.h));if(doc.w*k*doc.h*k>16e6)k=Math.sqrt(16e6/(doc.w*doc.h));
     const c=document.createElement('canvas');c.width=Math.round(doc.w*k);c.height=Math.round(doc.h*k);

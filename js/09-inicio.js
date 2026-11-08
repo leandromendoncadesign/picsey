@@ -6,6 +6,17 @@ $('#spBlank').onclick=()=>{doc={w:1080,h:1080,bg:'#ffffff',adj:defAdj(),nid:1,la
 $('#spCont').onclick=()=>{showSplash(false);panel();render()};
 $('#spLog').onclick=showChangelog;
 
+/* ---------- animação de entrada e saída ---------- */
+(function(){const still=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  for(const id of['lst','lay','splash','sheet','effbar','topEff']){const el=$('#'+id);let tm=0;
+    Object.defineProperty(el,'hidden',{configurable:true,get(){return el.hasAttribute('hidden')||el.classList.contains('out')},
+      set(v){clearTimeout(tm);
+        if(v){if(el.hasAttribute('hidden')||still){el.classList.remove('out');el.setAttribute('hidden','');return}
+          el.classList.add('out');tm=setTimeout(()=>{el.setAttribute('hidden','');el.classList.remove('out')},210)}
+        else{el.classList.remove('out');el.removeAttribute('hidden')}}})}
+  document.addEventListener('gesturestart',e=>e.preventDefault());document.addEventListener('gesturechange',e=>e.preventDefault());
+  window.addEventListener('scroll',()=>{if(scrollY||scrollX)scrollTo(0,0)});
+  const ve=()=>{if(scrollY)scrollTo(0,0)};window.addEventListener('resize',ve);document.addEventListener('focusout',()=>setTimeout(ve,50))})();
 /* ---------- início ---------- */
 async function restoreFonts(){const keys=await kvKeys();for(const k of keys||[])if(String(k).startsWith('font:')){const buf=await kvGet(k),n=String(k).slice(5);try{const ff=new FontFace(n,buf);await ff.load();document.fonts.add(ff);customFonts[n]=ff}catch(e){}}}
 async function loadState(s){const o=JSON.parse(s);doc=o.doc;sel=o.sel;fixDoc();

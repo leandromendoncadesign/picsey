@@ -1,8 +1,13 @@
 'use strict';
-const VERSION='0.5.1';
-const CHANGELOG=[{v:'0.5.1',d:'08/11/2026',t:[
+const VERSION='0.6.1';
+const CHANGELOG=[{v:'0.6.1',d:'08/11/2026',h:'20:20',t:[
+ 'Ícone do app trocado pelo novo, só o balão com o nome PicSey. Os cantos brancos da imagem foram preenchidos com o fundo escuro, então o ícone fica sem bordas brancas.']},{v:'0.6.0',d:'08/11/2026',h:'20:00',t:[
+ 'O app agora se chama PicSey.',
+ 'A tela inicial usa a nova imagem do PicSey (balão com o robô e a maçã) no lugar da logo antiga.',
+ 'O ícone do app também foi trocado pela nova logo.',
+ 'O histórico de mudanças passa a mostrar a hora de cada versão.']},{v:'0.5.1',d:'08/11/2026',h:'19:02',t:[
  'Corrigido: no app instalado na Tela de Início, a tela às vezes dava zoom e a parte de cima (botões de início, histórico e desfazer) sumia. Agora a página fica travada no tamanho da tela, o zoom por gesto e por campo de texto foi bloqueado e a área da barra de status é respeitada.',
- 'Animações de entrada e saída nos menus: as listas (Ajustar, Efeito, Adesivo), a tela de Camadas, o painel de opções, a barra do efeito, as janelas e a tela inicial agora deslizam e esmaecem em vez de aparecer de repente.']},{v:'0.5.0',d:'08/11/2026',t:[
+ 'Animações de entrada e saída nos menus: as listas (Ajustar, Efeito, Adesivo), a tela de Camadas, o painel de opções, a barra do efeito, as janelas e a tela inicial agora deslizam e esmaecem em vez de aparecer de repente.']},{v:'0.5.0',d:'08/11/2026',h:'18:42',t:[
  'Navegação refeita: novo botão Início (casinha) no canto da arte volta para a tela inicial, e o projeto continua salvo.',
  'Ao concluir ou cancelar um filtro, ajuste, recorte ou o pincel, você volta para a lista de onde saiu (Ajustar ou Efeito), no mesmo ponto da rolagem.',
  'Camadas agora abre em tela própria, com miniaturas, e não cobre mais as opções do objeto que você está editando.',
