@@ -1,0 +1,14 @@
+Quotes Editor 0.5.0
+
+Estrutura
+  index.html              página principal
+  css/style.css           estilos e fontes
+  js/                     scripts em ordem numérica (versao.js guarda a versão e o histórico de mudanças)
+  fonts/                  fontes do PicSay (licença em OFL.txt)
+  icons/                  ícones do app (icon-1024.png é o ícone principal)
+  manifest.webmanifest    dados para instalar na Tela de Início
+
+Como usar
+  Publique a pasta inteira (por exemplo no GitHub Pages), abra o endereço no Safari do iPhone
+  e use Compartilhar > Adicionar à Tela de Início.
+  Os scripts carregam nesta ordem, então não renomeie os arquivos de js/.
