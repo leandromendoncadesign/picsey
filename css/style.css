@@ -154,7 +154,7 @@ input[type=number]{width:100px;font-size:17px}
 .tag{margin:10px 0 18px}
 .gbtn+.gbtn{margin-top:2px}
 #layList{flex:1;overflow:auto;overscroll-behavior:contain;padding:12px var(--gy) 12px var(--gx);display:flex;flex-direction:column;gap:10px}
-#layFoot{flex:none;background:var(--bar);padding:14px var(--gy) calc(16px + env(safe-area-inset-bottom,0px)) var(--gx);display:flex;flex-direction:column;gap:8px}
+#layFoot{flex:none;background:var(--bar);padding:14px var(--gy) 16px var(--gx);display:flex;flex-direction:column;gap:8px}
 .lrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;border-radius:10px;padding:6px 8px 6px 6px;background:var(--panel2);border:2px solid transparent}
 .lrow.on{border-color:var(--accent)}
 .lrow .th{width:64px;height:48px;border-radius:4px;flex:none;background:#ddd}
@@ -185,6 +185,19 @@ input,select,textarea{font-size:16px}
 .modal .dlg{animation:qPop .28s cubic-bezier(.2,.8,.2,1) both}
 .modal.out{animation:qFadeOut .2s ease-in both;pointer-events:none}
 .modal.out .dlg{animation:qPopOut .2s ease-in both}
+#ovl{position:absolute;left:0;right:0;bottom:0;z-index:4;background:var(--panel);border-top:1px solid #000;border-radius:14px 14px 0 0;max-height:52%;overflow:auto;overscroll-behavior:contain;touch-action:auto;-webkit-user-select:text;user-select:text;box-shadow:0 -6px 24px rgba(0,0,0,.35)}
+#ovl.full{max-height:58%}
+#ovlBody{padding:12px var(--gy) 14px var(--gx);display:flex;flex-direction:column;gap:12px}
+#ovl:not(.full) #ovlBody{padding-top:10px;padding-bottom:10px}
+#ovl .acts{touch-action:auto}
+#ovl.out,#ovl{animation:qIn .26s cubic-bezier(.2,.8,.2,1) both}
+#ovl.out{animation:qOut .2s ease-in both;pointer-events:none}
+.act.danger{color:#ff8a80}
+#lay{background:rgba(0,0,0,.55);align-items:center;justify-content:flex-start;padding:calc(env(safe-area-inset-top,0px) + 58px) 12px 12px}
+#lay .card{width:100%;max-width:520px;max-height:min(74vh,660px);display:flex;flex-direction:column;background:var(--panel);border-radius:14px;overflow:hidden;box-shadow:0 12px 44px rgba(0,0,0,.65)}
+#lay .bar{border-radius:14px 14px 0 0}
+.lrow .lk.on{background:var(--accent);color:var(--accent-fg)}
+@media (prefers-reduced-motion:reduce){#ovl{animation:none!important}}
 @media (prefers-reduced-motion:reduce){#lst,#lay,#sheet,#effbar,#splash,#topEff,.modal,.modal .dlg{animation:none!important}}
 @media (prefers-reduced-motion:reduce){#toast{transition:none}}
 
