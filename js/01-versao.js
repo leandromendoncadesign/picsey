@@ -1,6 +1,12 @@
 'use strict';
-const VERSION='0.6.1';
-const CHANGELOG=[{v:'0.6.1',d:'08/11/2026',h:'20:20',t:[
+const VERSION='0.7.0';
+const CHANGELOG=[{v:'0.7.0',d:'09/11/2026',h:'06:09',t:[
+ 'A arte não encolhe mais quando você seleciona um objeto: aparece só uma barra curta de ações flutuando sobre a arte (Opções, Trancar, Espelhar, Virar, Girar 90°, Duplicar, Excluir, e Meia-lua e Rasterizar para texto). Tocando em Opções abre o painel completo, também flutuando por cima, sem mexer no tamanho da imagem. Só o pincel e o recorte ainda reduzem a arte, porque precisam dos controles na tela.',
+ 'Efeitos e ajustes de imagem agora só atingem imagens e pinturas. Texto e formas ficam intactos, a menos que o texto seja rasterizado.',
+ 'Trancar camada: uma camada trancada não move, não gira e não redimensiona, e o toque passa direto para o que estiver embaixo. Tranque pela barra de ações ou pela lista de Camadas, e destranque do mesmo jeito.',
+ 'Novas formas Linha e Seta, e estilo da linha (contínua, tracejada ou pontilhada) para qualquer forma.',
+ 'Redimensionar arrastando a aresta: em formas e imagens, arraste uma borda para esticar só naquele lado, ou um canto para esticar nos dois sentidos. As bolinhas nas arestas mostram onde pegar.',
+ 'Camadas virou um popup aberto por um botão no topo da arte, no lugar da aba de baixo, e agora cada camada tem o botão de trancar.']},{v:'0.6.1',d:'08/11/2026',h:'20:20',t:[
  'Ícone do app trocado pelo novo, só o balão com o nome PicSey. Os cantos brancos da imagem foram preenchidos com o fundo escuro, então o ícone fica sem bordas brancas.']},{v:'0.6.0',d:'08/11/2026',h:'20:00',t:[
  'O app agora se chama PicSey.',
  'A tela inicial usa a nova imagem do PicSey (balão com o robô e a maçã) no lugar da logo antiga.',

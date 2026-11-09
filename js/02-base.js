@@ -53,6 +53,8 @@ const SHAPES=[
  {v:'heart',l:'Coração',p:'<path d="M15 26C4 18 4 9 10 7c3-1 5 1 5 3 0-2 2-4 5-3 6 2 6 11-5 19z"/>'},
  {v:'speech',l:'Balão de fala',p:'<path d="M15 5C8 5 4 9 4 14s4 8 9 9l-2 5 7-5c6-1 10-4 10-9s-5-9-13-9z"/>'},
  {v:'thought',l:'Pensamento',p:'<ellipse cx="14" cy="11" rx="10" ry="7"/><circle cx="12" cy="21" r="2.5"/><circle cx="9" cy="26" r="1.5"/>'},
+ {v:'line',l:'Linha',p:'<path d="M4 22 26 8" stroke-linecap="round"/>'},
+ {v:'arrow',l:'Seta',p:'<path d="M4 22 26 8M18 7.500 26 8l-3.500 7" stroke-linecap="round"/>'},
  {v:'burst',l:'Grito',p:'<path d="m15 2 3 6 6-3-1 7 7 2-6 4 4 6-7-1-1 7-5-5-5 5-1-7-7 1 4-6-6-4 7-2-1-7 6 3z"/>'}];
 const shapeName=v=>(SHAPES.find(s=>s.v===v)||{}).l||'Forma';
 

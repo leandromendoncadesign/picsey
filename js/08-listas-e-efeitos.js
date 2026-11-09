@@ -71,7 +71,7 @@ const LISTS={
  sticker:{title:'Adesivo',sections:[
   {title:'Texto',items:[{label:'Texto',icon:'text',go:()=>addText()}]},
   {title:'Balões',items:[SH('Balão de fala','speech'),SH('Balão de pensamento','thought'),SH('Balão de grito','burst')]},
-  {title:'Formas',items:[SH('Retângulo','rect'),SH('Retângulo arredondado','round'),SH('Círculo','ellipse'),SH('Triângulo','triangle'),SH('Estrela','star'),SH('Coração','heart')]}]}};
+  {title:'Formas',items:[SH('Retângulo','rect'),SH('Retângulo arredondado','round'),SH('Círculo','ellipse'),SH('Triângulo','triangle'),SH('Linha','line'),SH('Seta','arrow'),SH('Estrela','star'),SH('Coração','heart')]}]}};
 let eff=null,effTarget='layer',backKind=null,listScroll={};
 function goBack(){const k=backKind;backKind=null;if(k)openList(k,true)}
 const effAdj=()=>{const l=curLayer();return effTarget==='layer'&&l&&l.type==='image'?l.adj:doc.adj};
@@ -102,8 +102,8 @@ function openList(kind,keep){
   $('#lst').hidden=false;list.scrollTop=keep?(listScroll[kind]||0):0;
   let i=0;const run=()=>{const t0=performance.now();while(i<jobs.length&&performance.now()-t0<14)jobs[i++]();if(i<jobs.length)setTimeout(run,0)};run();
 }
-function showEffMode(on){$('#topEff').hidden=!on;$('#effbar').hidden=!on;$('#bottom').hidden=on;$('#fl').hidden=on;if(on)$('#sheet').hidden=true}
-function startEffect(it){const l=curLayer();effTarget=l&&l.type==='image'?'layer':'all';eff={it,adj:null,backup:null};showEffMode(true);beginEff()}
+function showEffMode(on){if(on)$('#ovl').hidden=true;$('#topEff').hidden=!on;$('#effbar').hidden=!on;$('#bottom').hidden=on;$('#fl').hidden=on;if(on)$('#sheet').hidden=true}
+function startEffect(it){const l=curLayer();if(l&&(l.type==='text'||l.type==='shape'))toast('Efeitos não afetam texto nem formas. Para o texto, use Rasterizar.');effTarget=l&&l.type==='image'?'layer':'all';eff={it,adj:null,backup:null};showEffMode(true);beginEff()}
 function beginEff(){const it=eff.it;eff.adj=effAdj();eff.backup=JSON.parse(JSON.stringify(eff.adj));
   if(!it.on(eff.adj)&&it.init)it.set(eff.adj,it.init);
   const a=eff.adj,r=$('#effRange');r.min=it.min;r.max=it.max;r.step=it.step;r.value=it.on(a)?it.get(a):it.off;

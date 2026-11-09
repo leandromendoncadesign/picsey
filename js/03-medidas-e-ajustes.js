@@ -4,6 +4,7 @@ const mctx=document.createElement('canvas').getContext('2d');
 const fontStr=(l,k)=>`${l.italic?'italic ':''}${l.bold?'700':'400'} ${Math.max(1,l.size*k)}px "${l.font}", sans-serif`;
 function arcSag(ws,th,size){th=Math.abs(th);let m=0;for(const w of ws)if(w>1)m=Math.max(m,w/th*(1-Math.cos(th/2)));return m+size*.1*th/Math.PI}
 function bbox(l){
+  if(l.type==='shape'&&(l.shape==='line'||l.shape==='arrow'))return{w:l.w,h:Math.max(l.h,l.strokeW+24)};
   if(l.type!=='text')return{w:l.w,h:l.h};
   mctx.font=fontStr(l,1);
   const lines=l.text.split('\n');let w=0;const ws=[];for(const s of lines){const m=mctx.measureText(s).width;ws.push(m);w=Math.max(w,m)}

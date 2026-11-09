@@ -8,7 +8,7 @@ $('#spLog').onclick=showChangelog;
 
 /* ---------- animação de entrada e saída ---------- */
 (function(){const still=matchMedia('(prefers-reduced-motion:reduce)').matches;
-  for(const id of['lst','lay','splash','sheet','effbar','topEff']){const el=$('#'+id);let tm=0;
+  for(const id of['lst','lay','splash','sheet','ovl','effbar','topEff']){const el=$('#'+id);let tm=0;
     Object.defineProperty(el,'hidden',{configurable:true,get(){return el.hasAttribute('hidden')||el.classList.contains('out')},
       set(v){clearTimeout(tm);
         if(v){if(el.hasAttribute('hidden')||still){el.classList.remove('out');el.setAttribute('hidden','');return}

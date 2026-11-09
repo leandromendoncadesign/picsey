@@ -61,6 +61,8 @@ function brushTarget(){const s=curLayer();
 function shapePath(c,l,w,hh){
   const rx=w/2,ry=hh/2;c.beginPath();
   switch(l.shape){
+    case'line':c.moveTo(-rx,0);c.lineTo(rx,0);break;
+    case'arrow':{const kk=l.w?w/l.w:1,hs=Math.min(w*.45,Math.max(hh*.9,(l.strokeW||4)*kk*3.2));c.moveTo(-rx,0);c.lineTo(rx,0);c.moveTo(rx-hs,-hs*.6);c.lineTo(rx,0);c.lineTo(rx-hs,hs*.6);break}
     case'rect':c.rect(-rx,-ry,w,hh);break;
     case'round':{const r=Math.min(w,hh)/2*l.radius;c.moveTo(-rx+r,-ry);c.arcTo(rx,-ry,rx,ry,r);c.arcTo(rx,ry,-rx,ry,r);c.arcTo(-rx,ry,-rx,-ry,r);c.arcTo(-rx,-ry,rx,-ry,r);c.closePath();break}
     case'ellipse':c.ellipse(0,0,rx,ry,0,0,Math.PI*2);break;
@@ -82,7 +84,10 @@ function drawLayer(c,l,k){
   else if(l.type==='paint'){const s=l.strokes.length?paintSource(l):null;if(s)c.drawImage(s,-l.w*k/2,-l.h*k/2,l.w*k,l.h*k)}
   else if(l.type==='shape'){shapePath(c,l,l.w*k,l.h*k);
     if(l.fill){c.fillStyle=l.fillC;c.fill()}
-    if(l.strokeW>0){c.lineWidth=l.strokeW*k;c.strokeStyle=l.strokeC;c.lineJoin='round';c.stroke()}}
+    if(l.strokeW>0){c.lineWidth=l.strokeW*k;c.strokeStyle=l.strokeC;c.lineJoin='round';
+      const ln=l.shape==='line'||l.shape==='arrow';c.lineCap=ln||l.dash===2?'round':'butt';
+      if(l.dash===1)c.setLineDash([l.strokeW*k*3,l.strokeW*k*2]);else if(l.dash===2)c.setLineDash([.01,l.strokeW*k*1.9]);
+      c.stroke();c.setLineDash([])}}
   else{
     const lines=l.text.split('\n');c.font=fontStr(l,k);c.textBaseline='middle';c.textAlign='left';c.lineJoin='round';c.miterLimit=2;
     const lh=l.size*l.lh*k,ws=lines.map(s=>c.measureText(s).width),bw=Math.max(...ws),tot=lh*lines.length;
@@ -100,8 +105,13 @@ function drawLayer(c,l,k){
   c.restore();
 }
 function renderDoc(c,k,opaque){
-  const W=Math.round(doc.w*k),H=Math.round(doc.h*k);
-  if(doc.bg){c.fillStyle=doc.bg;c.fillRect(0,0,W,H)}else if(opaque){c.fillStyle='#ffffff';c.fillRect(0,0,W,H)}
-  for(const l of doc.layers)if(l.vis)drawLayer(c,l,k);
-  if(!isDefAdj(doc.adj)){const id=c.getImageData(0,0,W,H);applyAdj(id,doc.adj,k);c.putImageData(id,0,0)}
-}
+  const W=Math.round(doc.w*k),H=Math.round(doc.h*k),bgc=doc.bg||(opaque?'#ffffff':null);
+  if(isDefAdj(doc.adj)){if(bgc){c.fillStyle=bgc;c.fillRect(0,0,W,H)}for(const l of doc.layers)if(l.vis)drawLayer(c,l,k);return}
+  /* efeitos da arte inteira: só imagens e pinturas, texto e formas ficam por cima sem efeito */
+  let run=null;
+  const rc=()=>{if(!run)run=mk(W,H);return run.getContext('2d')};
+  const flush=()=>{if(!run)return;const x=run.getContext('2d'),id=x.getImageData(0,0,W,H);applyAdj(id,doc.adj,k);x.putImageData(id,0,0);c.drawImage(run,0,0);run=null};
+  if(bgc){const x=rc();x.fillStyle=bgc;x.fillRect(0,0,W,H)}
+  for(const l of doc.layers){if(!l.vis)continue;
+    if(l.type==='text'||l.type==='shape'){flush();drawLayer(c,l,k)}else drawLayer(rc(),l,k)}
+  flush()}

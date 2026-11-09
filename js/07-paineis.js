@@ -20,7 +20,6 @@ const BOT=[
  ['adjust','Ajustar','<path d="M3 7h6M15 7h6M3 12h2M11 12h10M3 17h8M17 17h4"/><circle cx="12" cy="7" r="2.2"/><circle cx="8" cy="12" r="2.2"/><circle cx="14" cy="17" r="2.2"/>'],
  ['effect','Efeito','<path d="m3.5 20.5 10-10"/><path d="m15 4 1.1 2.9L19 8l-2.9 1.1L15 12l-1.1-2.9L11 8l2.9-1.1z"/><path d="m19 14 .7 1.8L21.5 16.5l-1.8.7L19 19l-.7-1.8-1.8-.7 1.8-.7z"/>'],
  ['sticker','Adesivo','<path d="M12 4c5 0 9 3 9 7s-4 7-9 7c-1 0-2-.1-3-.3L5 20l1-3.5C4.2 15.3 3 13.300 3 11c0-4 4-7 9-7z" fill="currentColor"/>'],
- ['layers','Camadas','<path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/>'],
  ['export','Exportar','<circle cx="6" cy="12" r="2.6" fill="currentColor"/><circle cx="18" cy="6" r="2.6" fill="currentColor"/><circle cx="18" cy="18" r="2.6" fill="currentColor"/><path d="m8.3 10.8 7.4-3.6M8.3 13.2l7.4 3.6"/>']];
 const bottomEl=$('#bottom');
 BOT.forEach(([id,lab,ic])=>bottomEl.append(h('button',{class:'bi','data-id':id,onclick:()=>botTap(id)},svgI(ic),lab)));
@@ -34,7 +33,12 @@ const IC={
  rot:'<path d="M20 12a8 8 0 1 1-3-6.2"/><path d="M20 4v5h-5"/>',
  arc:'<path d="M3 18c1-9 17-9 18 0"/><path d="M7.500 13.500h.01M12 11.800h.01M16.500 13.500h.01" stroke-width="3.2"/>',
  ras:'<rect x="4" y="4" width="7" height="7"/><rect x="13" y="13" width="7" height="7"/><rect x="13" y="4" width="7" height="7" opacity=".45"/><rect x="4" y="13" width="7" height="7" opacity=".45"/>'};
-const act=(label,ic,fn,on)=>h('button',{class:'act'+(on?' on':''),onclick:fn},svgI(ic),h('span',{},label));
+Object.assign(IC,{opts:'<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',
+ lock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+ unlock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 7.500-2"/>',
+ dup:'<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M15 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3"/>',
+ del:'<path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13"/>'});
+const act=(label,ic,fn,on,cls)=>h('button',{class:'act'+(on?' on':'')+(cls?' '+cls:''),onclick:fn},svgI(ic),h('span',{},label));
 function xformActs(l,extra){
   return h('div',{class:'acts'},...(extra||[]),
     act('Espelhar',IC.flipH,()=>{l.flip=!l.flip;commit('Espelhar');panel();render()},l.flip),
@@ -49,19 +53,33 @@ async function rasterizeText(l){
     doc.layers[i]=n;sel=n.id;commit('Rasterizar texto');panel();render();toast('O texto virou imagem. Agora aceita efeitos, ajustes e borracha.')}
   catch(e){toast(e.message||'Falha ao rasterizar')}}
 const SHEETNAME={text:'Texto',shape:'Forma',image:'Imagem',paint:'Pintura'};
+let optsOpen=false;
+function quickBar(l){const lk=!!l.locked;
+  return h('div',{class:'acts'},...[
+    act('Opções',IC.opts,()=>{optsOpen=true;panel()}),
+    act(lk?'Destrancar':'Trancar',lk?IC.unlock:IC.lock,()=>{l.locked=!l.locked;commit(l.locked?'Trancar camada':'Destrancar camada');panel();render();toast(l.locked?'Camada trancada. Ela não se move mais.':'Camada destrancada.')},lk),
+    act('Espelhar',IC.flipH,()=>{l.flip=!l.flip;commit('Espelhar');panel();render()},l.flip),
+    act('Virar',IC.flipV,()=>{l.flipV=!l.flipV;commit('Virar');panel();render()},l.flipV),
+    act('Girar 90°',IC.rot,()=>{let r=l.rot+90;if(r>180)r-=360;l.rot=r;commit('Girar 90°');panel();render()}),
+    l.type==='text'?act('Meia-lua',IC.arc,()=>{l.arc=l.arc?0:100;commit('Meia-lua');panel();render()},!!l.arc):null,
+    l.type==='text'?act('Rasterizar',IC.ras,()=>rasterizeText(l)):null,
+    act('Duplicar',IC.dup,()=>dupLayer(l.id)),
+    lk?null:act('Excluir',IC.del,()=>deleteLayer(l.id),false,'danger')].filter(Boolean))}
 function panel(){
-  bottomEl.querySelector('[data-id=layers]').classList.toggle('on',mode==='layers');
-  const body=$('#panelBody'),sh=$('#sheet');body.replaceChildren();
+  const body=$('#panelBody'),sh=$('#sheet'),ov=$('#ovl'),ob=$('#ovlBody');body.replaceChildren();ob.replaceChildren();
   let title=null,items=null,close=null;
-  if(crop){items=pCrop()}
+  if(crop)items=pCrop();
   else if(mode==='brush'){title='Pincel';items=pBrush();close=['Concluir',()=>{mode='view';goBack()}]}
-  else if(mode==='layers'){title='Camadas';items=pLayers();close=['Fechar',()=>{mode='view'}]}
-  else{const l=curLayer();if(l){title=SHEETNAME[l.type];items=l.type==='text'?pText():l.type==='shape'?pShape():l.type==='image'?pImage():pPaintSel();close=['Concluir',()=>{sel=null}]}}
   const list=items?items.flat(Infinity).filter(Boolean):[];
-  if(!list.length){sh.hidden=true;return}
-  sh.hidden=false;
-  if(title)body.append(h('div',{class:'shead'},h('strong',{},title),close?h('button',{class:'ghost',onclick:()=>{close[1]();panel();render()}},close[0]):null));
-  body.append(...list)}
+  if(list.length){ov.hidden=true;sh.hidden=false;
+    if(title)body.append(h('div',{class:'shead'},h('strong',{},title),close?h('button',{class:'ghost',onclick:()=>{close[1]();panel();render()}},close[0]):null));
+    body.append(...list);return}
+  sh.hidden=true;
+  const l=curLayer();if(!l){ov.hidden=true;optsOpen=false;return}
+  ov.hidden=false;ov.classList.toggle('full',optsOpen);
+  if(!optsOpen){ob.append(quickBar(l));return}
+  const its=(l.type==='text'?pText():l.type==='shape'?pShape():l.type==='image'?pImage():pPaintSel()).flat(Infinity).filter(Boolean);
+  ob.append(h('div',{class:'shead'},h('strong',{},SHEETNAME[l.type]+(l.locked?' (trancada)':'')),h('button',{class:'ghost',onclick:()=>{optsOpen=false;panel()}},'Fechar')),...its)}
 function pLayers(){const out=[];
   if(!doc.layers.length)out.push(h('div',{class:'note'},'Nenhuma camada ainda. Use as abas Texto, Formas ou Imagem para adicionar.'));
   const n=doc.layers.length;
@@ -101,15 +119,17 @@ function pText(){const out=[];const l=curLayer();
   return out}
 function pShape(){const out=[];const l=curLayer();if(!l||l.type!=='shape')return out;
   const mx=Math.max(doc.w,doc.h)*1.5;
+  const ln=l.shape==='line'||l.shape==='arrow';
   out.push(xformActs(l),h('div',{class:'h'},'Editar forma selecionada'),
-    toggle('Preenchimento',()=>l.fill,v=>l.fill=v),l.fill?colorField('Cor de dentro',()=>l.fillC,v=>l.fillC=v):null,
-    slider('Contorno',0,Math.max(40,Math.round(doc.w/20)),1,()=>l.strokeW,v=>l.strokeW=v,v=>Math.round(v)),
-    l.strokeW>0?colorField('Cor do contorno',()=>l.strokeC,v=>l.strokeC=v):null,
-    slider('Largura',20,mx,1,()=>l.w,v=>l.w=v,v=>Math.round(v)),slider('Altura',20,mx,1,()=>l.h,v=>l.h=v,v=>Math.round(v)),
+    ln?null:toggle('Preenchimento',()=>l.fill,v=>l.fill=v),!ln&&l.fill?colorField('Cor de dentro',()=>l.fillC,v=>l.fillC=v):null,
+    slider(ln?'Espessura':'Contorno',ln?1:0,Math.max(40,Math.round(doc.w/20)),1,()=>l.strokeW,v=>l.strokeW=v,v=>Math.round(v)),
+    l.strokeW>0?colorField(ln?'Cor da linha':'Cor do contorno',()=>l.strokeC,v=>l.strokeC=v):null,
+    l.strokeW>0?chips([{v:0,l:'Contínua'},{v:1,l:'Tracejada'},{v:2,l:'Pontilhada'}],()=>l.dash||0,v=>l.dash=v):null,
+    slider(ln?'Comprimento':'Largura',20,mx,1,()=>l.w,v=>l.w=v,v=>Math.round(v)),ln?null:slider('Altura',20,mx,1,()=>l.h,v=>l.h=v,v=>Math.round(v)),
     l.shape==='round'?slider('Cantos',0,1,0.01,()=>l.radius,v=>l.radius=v,v=>Math.round(v*100)+'%'):null,
     l.shape==='star'||l.shape==='burst'?slider('Pontas',3,l.shape==='burst'?30:12,1,()=>l.points,v=>l.points=Math.round(v),v=>Math.round(v)):null,
     l.shape==='speech'||l.shape==='thought'?[slider('Direção',0,360,1,()=>l.tailA,v=>l.tailA=v,v=>Math.round(v)+'°'),slider('Tamanho da ponta',0.1,1.2,0.01,()=>l.tailL,v=>l.tailL=v)]:null,
-    opacityRow(l));
+    opacityRow(l),h('div',{class:'note'},'Arraste uma borda da forma para esticar só naquele lado, ou um canto para esticar nos dois sentidos.'));
   return out}
 function pImage(){const l=curLayer();if(!l||l.type!=='image')return[];
   return[xformActs(l),h('div',{class:'chips'},h('button',{class:'chip',onclick:()=>{fillLayer(l,true)}},'Preencher a tela'),h('button',{class:'chip',onclick:()=>{fillLayer(l,false)}},'Caber na tela'),h('button',{class:'chip',onclick:()=>{brush.mode='erase';mode='brush';panel();render()}},'Apagar com a borracha')),
@@ -173,8 +193,8 @@ function buildLayers(){const list=$('#layList'),foot=$('#layFoot'),keep=list.scr
   if(!n)list.append(h('div',{class:'note'},'Nenhuma camada ainda. Use Adesivo para adicionar texto e formas, ou Efeito para inserir uma imagem.'));
   for(let i=n-1;i>=0;i--){const l=doc.layers[i];
     list.append(h('div',{class:'lrow'+(l.id===sel?' on':'')},layThumb(l),
-      h('button',{class:'nm',onclick:()=>{sel=l.id;closeLayers()}},h('b',{},layerLabel(l)),h('small',{},TYPELAB[l.type]+(l.vis?'':' · oculta'))),
-      h('div',{class:'lb'},h('button',{class:'s','aria-label':l.vis?'Ocultar':'Mostrar',onclick:()=>{l.vis=!l.vis;commit(l.vis?'Mostrar camada':'Ocultar camada');buildLayers();render()}},l.vis?'●':'○'),
+      h('button',{class:'nm',onclick:()=>{sel=l.id;closeLayers()}},h('b',{},layerLabel(l)),h('small',{},TYPELAB[l.type]+(l.vis?'':' · oculta')+(l.locked?' · trancada':''))),
+      h('div',{class:'lb'},h('button',{class:'s lk'+(l.locked?' on':''),'aria-label':l.locked?'Destrancar':'Trancar',onclick:()=>{l.locked=!l.locked;commit(l.locked?'Trancar camada':'Destrancar camada');buildLayers();panel();render()}},l.locked?'🔒':'🔓'),h('button',{class:'s','aria-label':l.vis?'Ocultar':'Mostrar',onclick:()=>{l.vis=!l.vis;commit(l.vis?'Mostrar camada':'Ocultar camada');buildLayers();render()}},l.vis?'●':'○'),
       h('button',{class:'s','aria-label':'Para frente',disabled:i===n-1,onclick:()=>{moveLayer(l.id,1);buildLayers()}},'↑'),
       h('button',{class:'s','aria-label':'Para trás',disabled:i===0,onclick:()=>{moveLayer(l.id,-1);buildLayers()}},'↓'),
       h('button',{class:'s','aria-label':'Duplicar',onclick:()=>{dupLayer(l.id);buildLayers()}},'⧉'),
@@ -183,4 +203,4 @@ function buildLayers(){const list=$('#layList'),foot=$('#layFoot'),keep=list.scr
   const l=curLayer();
   if(l)foot.append(h('div',{class:'h',style:{marginTop:0}},'Selecionada: '+layerLabel(l)),slider('Opacidade',0,100,1,()=>l.op*100,v=>l.op=v/100,v=>Math.round(v)+'%'));
   foot.append(h('div',{class:'note'},'↑ traz para frente e ↓ envia para trás. A camada de cima aparece sobre as de baixo. Toque no nome para editar a camada.'))}
-$('#layClose').onclick=closeLayers;
+$('#layClose').onclick=closeLayers;$('#layBtn').onclick=openLayers;$('#lay').addEventListener('click',e=>{if(e.target.id==='lay')closeLayers()});

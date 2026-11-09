@@ -34,10 +34,10 @@ function deleteLayer(id){doc.layers=doc.layers.filter(l=>l.id!==id);if(sel===id)
 function moveLayer(id,dir){const i=doc.layers.findIndex(l=>l.id===id),j=i+dir;if(j<0||j>=doc.layers.length)return;[doc.layers[i],doc.layers[j]]=[doc.layers[j],doc.layers[i]];commit();panel();render()}
 function dupLayer(id){const i=doc.layers.findIndex(l=>l.id===id);if(i<0)return;const c=JSON.parse(JSON.stringify(doc.layers[i],rep));c.id=doc.nid++;c.x+=doc.w*.03;c.y+=doc.w*.03;doc.layers.splice(i+1,0,c);sel=c.id;commit();panel();render()}
 function addText(){const l=newLayer('text',{text:'Seu texto aqui',font:'Anton',size:Math.round(doc.w*.085),color:'#ffffff',bold:false,italic:false,align:'center',lh:1.15,strokeW:0,strokeC:'#000000',shadow:false,shC:'#000000',shB:10,shX:0,shY:6});
-  doc.layers.push(l);sel=l.id;commit('Texto');panel();render()}
-function addShape(v){const base=Math.round(doc.w*.4);
-  const l=newLayer('shape',{shape:v,w:base,h:v==='speech'||v==='thought'?Math.round(base*.65):v==='rect'||v==='round'?Math.round(base*.65):base,fill:false,fillC:'#ffffff',strokeW:Math.max(4,Math.round(doc.w*.008)),strokeC:'#ffffff',radius:.35,points:v==='burst'?12:5,tailA:100,tailL:.45});
-  doc.layers.push(l);sel=l.id;commit('Forma');panel();render()}
+  doc.layers.push(l);sel=l.id;optsOpen=true;commit('Texto');panel();render()}
+function addShape(v){const base=Math.round(doc.w*.4),ln=v==='line'||v==='arrow';
+  const l=newLayer('shape',{shape:v,w:base,h:ln?30:v==='speech'||v==='thought'?Math.round(base*.65):v==='rect'||v==='round'?Math.round(base*.65):base,fill:false,fillC:'#ffffff',strokeW:Math.max(ln?6:4,Math.round(doc.w*(ln?.012:.008))),strokeC:'#ffffff',dash:0,radius:.35,points:v==='burst'?12:5,tailA:100,tailL:.45});
+  doc.layers.push(l);sel=l.id;optsOpen=true;commit('Forma');panel();render()}
 
 /* ---------- imagens ---------- */
 function loadImg(blob){return new Promise((res,rej)=>{const u=URL.createObjectURL(blob),im=new Image();im.onload=()=>res(im);im.onerror=()=>rej(new Error('Não consegui abrir a imagem.'));im.src=u})}
