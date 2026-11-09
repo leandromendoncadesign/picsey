@@ -60,7 +60,7 @@ $('#imgIn').onchange=e=>{const f=[...e.target.files];e.target.value='';if(f.leng
 /* ---------- fontes do aparelho ---------- */
 async function addFontFile(file){const buf=await file.arrayBuffer();let name=file.name.replace(/\.[^.]+$/,'').replace(/[_]+/g,' ').trim()||'Fonte';
   if(customFonts[name]||BUILTIN.includes(name))name+=' '+(Object.keys(customFonts).length+2);
-  const ff=new FontFace(name,buf);await ff.load();document.fonts.add(ff);customFonts[name]=ff;safe(()=>kvSet('font:'+name,buf));return name}
+  const ff=new FontFace(name,buf);await ff.load();document.fonts.add(ff);customFonts[name]=ff;fontBufs[name]=buf;safe(()=>kvSet('font:'+name,buf));return name}
 $('#fontIn').onchange=async e=>{const fs=[...e.target.files];e.target.value='';let ok=0,bad=0;
   for(const f of fs){try{await addFontFile(f);ok++}catch(err){bad++}}
   toast(ok?`${ok} fonte(s) carregada(s)${bad?`, ${bad} inválida(s)`:''}`:'Arquivo de fonte inválido. Use .ttf, .otf ou .woff.');

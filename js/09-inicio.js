@@ -18,7 +18,7 @@ $('#spLog').onclick=showChangelog;
   window.addEventListener('scroll',()=>{if(scrollY||scrollX)scrollTo(0,0)});
   const ve=()=>{if(scrollY)scrollTo(0,0)};window.addEventListener('resize',ve);document.addEventListener('focusout',()=>setTimeout(ve,50))})();
 /* ---------- início ---------- */
-async function restoreFonts(){const keys=await kvKeys();for(const k of keys||[])if(String(k).startsWith('font:')){const buf=await kvGet(k),n=String(k).slice(5);try{const ff=new FontFace(n,buf);await ff.load();document.fonts.add(ff);customFonts[n]=ff}catch(e){}}}
+async function restoreFonts(){const keys=await kvKeys();for(const k of keys||[])if(String(k).startsWith('font:')){const buf=await kvGet(k),n=String(k).slice(5);try{const ff=new FontFace(n,buf);await ff.load();document.fonts.add(ff);customFonts[n]=ff;fontBufs[n]=buf}catch(e){}}}
 async function loadState(s){const o=JSON.parse(s);doc=o.doc;sel=o.sel;fixDoc();
   for(const l of[...doc.layers])if(l.type==='image'&&!assets[l.asset]){const b=await kvGet('asset:'+l.asset);if(b){const im=await loadImg(b);assets[l.asset]={blob:b,img:im,w:im.naturalWidth,h:im.naturalHeight}}else doc.layers=doc.layers.filter(x=>x!==l)}
   if(!doc.layers.some(l=>l.id===sel))sel=null}

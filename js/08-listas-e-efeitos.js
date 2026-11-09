@@ -141,14 +141,47 @@ function openExport(){const body=h('div',{});const close=modal('Exportar',body);
     exp.fmt==='jpg'?h('label',{class:'row sl'},h('span',{class:'lab'},'Qualidade'),(()=>{const r=h('input',{type:'range',min:.5,max:1,step:.01});r.value=exp.q;r.addEventListener('input',()=>{exp.q=+r.value});return r})()):null,
     h('div',{class:'h'},'Tamanho'),opt([{v:0,l:'Original'},{v:2048,l:'Até 2048'},{v:1080,l:'Até 1080'}],()=>exp.max,v=>exp.max=v),
     h('div',{class:'note'},'Arte de '+doc.w+' × '+doc.h+' px.'),
-    h('button',{class:'btn accent',onclick:()=>{close();doExport()}},'Gerar imagem')].filter(Boolean))};build()}
+    h('button',{class:'btn accent',onclick:()=>{close();doExport()}},'Gerar imagem'),
+    h('div',{class:'h'},'Projeto editável'),h('div',{class:'note'},'Guarda camadas, textos, formas e imagens num arquivo .picsey para você continuar depois.'),...projBtns(close)].filter(Boolean))};build()}
 function openHistory(){const body=h('div',{class:'chlog'});const close=modal('Histórico',body);
   const build=()=>{body.replaceChildren(
     h('div',{class:'frow'},h('button',{class:'btn',style:{flex:1},disabled:hi<=0,onclick:()=>{if(hi>0){hi--;restore(hist[hi]);build()}}},'Desfazer'),h('button',{class:'btn',style:{flex:1},disabled:hi>=hist.length-1,onclick:()=>{if(hi<hist.length-1){hi++;restore(hist[hi]);build()}}},'Refazer')),
     h('div',{class:'h'},'Passos'),
     ...hist.map((_,i)=>i).reverse().map(i=>h('button',{class:'layer'+(i===hi?' on':''),onclick:()=>{hi=i;restore(hist[i]);build()}},h('span',{class:'nm'},(i+1)+'. '+(labels[i]||'Edição')))),
     h('div',{class:'h'},'Projeto'),
+    ...projBtns(close),
     h('button',{class:'btn',onclick:()=>{close();showSplash(true)}},'Tela inicial'),
     h('button',{class:'btn',onclick:()=>{close();showChangelog()}},'Histórico de mudanças do app'))};build()}
 $('#histBtn').onclick=openHistory;
 $('#homeBtn').onclick=()=>{closeList();$('#lay').hidden=true;showSplash(true)};
+
+/* ---------- projeto editável ---------- */
+const fontBufs={};
+const toB64=blob=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]||'');r.onerror=()=>rej(r.error);r.readAsDataURL(blob)});
+const fromB64=s=>{const bin=atob(s),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return u};
+async function buildProject(){
+  const parts=['{"formato":"picsey","versao":1,"app":'+JSON.stringify(VERSION)+',"salvo":'+JSON.stringify(new Date().toISOString())+',"doc":'+JSON.stringify(doc,rep)+',"imagens":{'];
+  const ids=[...new Set(doc.layers.filter(l=>l.type==='image').map(l=>l.asset))].filter(id=>assets[id]);
+  for(let i=0;i<ids.length;i++){const a=assets[ids[i]];parts.push((i?',':'')+JSON.stringify(ids[i])+':{"tipo":'+JSON.stringify(a.blob.type||'image/png')+',"dados":"',await toB64(a.blob),'"}')}
+  parts.push('},"fontes":{');
+  const fs=[...new Set(doc.layers.filter(l=>l.type==='text'&&customFonts[l.font]&&fontBufs[l.font]).map(l=>l.font))];
+  for(let i=0;i<fs.length;i++)parts.push((i?',':'')+JSON.stringify(fs[i])+':{"dados":"',await toB64(new Blob([fontBufs[fs[i]]])),'"}');
+  parts.push('}}');
+  return new Blob(parts,{type:'application/octet-stream'})}
+async function saveProject(){
+  try{toast('Preparando o projeto…');const blob=await buildProject(),d=new Date(),p2=n=>String(n).padStart(2,'0'),
+      name='picsey-'+d.getFullYear()+p2(d.getMonth()+1)+p2(d.getDate())+'-'+p2(d.getHours())+p2(d.getMinutes())+'.picsey',file=new File([blob],name,{type:'application/octet-stream'});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title:'Projeto PicSey'});toast('Escolha Salvar em Arquivos para guardar o projeto.');return}catch(e){if(e&&e.name==='AbortError')return}}
+    const u=URL.createObjectURL(blob),a=h('a',{href:u,download:name});document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),60000);toast('Projeto gerado: '+name)}
+  catch(e){toast('Não consegui salvar o projeto: '+(e.message||e))}}
+async function openProjectFile(file){
+  try{toast('Abrindo o projeto…');const o=JSON.parse(await file.text());
+    if(o.formato!=='picsey'||!o.doc||!Array.isArray(o.doc.layers))throw new Error('Esse arquivo não é um projeto do PicSey.');
+    for(const[id,v]of Object.entries(o.imagens||{})){const blob=new Blob([fromB64(v.dados)],{type:v.tipo||'image/png'}),im=await loadImg(blob);assets[id]={blob,img:im,w:im.naturalWidth,h:im.naturalHeight};safe(()=>kvSet('asset:'+id,blob))}
+    for(const[n,v]of Object.entries(o.fontes||{})){if(BUILTIN.includes(n)||customFonts[n])continue;try{const buf=fromB64(v.dados).buffer,ff=new FontFace(n,buf);await ff.load();document.fonts.add(ff);customFonts[n]=ff;fontBufs[n]=buf;safe(()=>kvSet('font:'+n,buf))}catch(e){}}
+    doc=o.doc;fixDoc();doc.layers=doc.layers.filter(l=>l.type!=='image'||assets[l.asset]);sel=null;crop=null;mode='view';view.zoom=1;view.px=view.py=0;
+    commit('Abrir projeto');showSplash(false);$('#lay').hidden=true;panel();render();toast('Projeto aberto.')}
+  catch(e){toast(e.message||'Não consegui abrir o projeto.')}}
+$('#projIn').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)openProjectFile(f)};
+$('#spProj').onclick=()=>$('#projIn').click();
+const projBtns=close=>[h('button',{class:'btn',onclick:()=>{close();saveProject()}},'Salvar projeto (.picsey)'),h('button',{class:'btn',onclick:()=>{close();$('#projIn').click()}},'Abrir projeto…')];

@@ -1,6 +1,9 @@
 'use strict';
-const VERSION='0.7.0';
-const CHANGELOG=[{v:'0.7.0',d:'09/11/2026',h:'06:09',t:[
+const VERSION='0.8.0';
+const CHANGELOG=[{v:'0.8.0',d:'09/11/2026',h:'06:22',t:[
+ 'Projeto editável: novo botão Salvar projeto guarda tudo em um arquivo .picsey (camadas, textos, formas, pinturas, imagens inseridas e as fontes do aparelho usadas). Em Abrir projeto você escolhe o arquivo e continua de onde parou, em qualquer aparelho.',
+ 'Os botões ficam em Exportar, no Histórico (botão com a seta para baixo) e na tela inicial (Abrir projeto salvo).',
+ 'Abrir um projeto vira um passo do histórico, então dá para desfazer e voltar ao que estava antes.']},{v:'0.7.0',d:'09/11/2026',h:'06:09',t:[
  'A arte não encolhe mais quando você seleciona um objeto: aparece só uma barra curta de ações flutuando sobre a arte (Opções, Trancar, Espelhar, Virar, Girar 90°, Duplicar, Excluir, e Meia-lua e Rasterizar para texto). Tocando em Opções abre o painel completo, também flutuando por cima, sem mexer no tamanho da imagem. Só o pincel e o recorte ainda reduzem a arte, porque precisam dos controles na tela.',
  'Efeitos e ajustes de imagem agora só atingem imagens e pinturas. Texto e formas ficam intactos, a menos que o texto seja rasterizado.',
  'Trancar camada: uma camada trancada não move, não gira e não redimensiona, e o toque passa direto para o que estiver embaixo. Tranque pela barra de ações ou pela lista de Camadas, e destranque do mesmo jeito.',
