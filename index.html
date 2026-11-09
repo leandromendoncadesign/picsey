@@ -27,12 +27,14 @@
   <div id="hint" hidden>Toque em Adesivo para adicionar um texto ou uma forma.</div>
   <div id="fl">
     <button id="homeBtn" aria-label="Tela inicial"><svg viewBox="0 0 24 24"><path d="M4 11 12 4l8 7"/><path d="M6 10v10h12V10"/><path d="M10 20v-6h4v6"/></svg></button>
+    <button id="layBtn" aria-label="Camadas"><svg viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/></svg></button>
     <button id="histBtn" aria-label="Histórico"><svg viewBox="0 0 24 24"><path d="M12 4v13M6 12l6 6 6-6"/><path d="M5 21h14"/></svg></button>
     <button id="undo" aria-label="Desfazer" disabled><svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button>
     <button id="redo" aria-label="Refazer" disabled><svg viewBox="0 0 24 24"><path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/></svg></button>
   </div>
   <div id="zoom"><button id="zin" aria-label="Aproximar">+</button><button id="zout" aria-label="Afastar">−</button><button id="zfit" aria-label="Ajustar à tela" style="font-size:15px">⤢</button></div>
   <div id="toast" role="status"></div>
+  <div id="ovl" hidden><div id="ovlBody"></div></div>
 </main>
 <div id="effbar" hidden>
   <div id="effOpts"></div>
@@ -48,9 +50,11 @@
 </div>
 
 <div id="lay" class="screen" hidden>
-  <div class="bar"><button class="ibtn" id="layClose" aria-label="Fechar"><svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5 5 19"/></svg></button><div class="ttl">Camadas</div></div>
-  <div id="layList"></div>
-  <div id="layFoot"></div>
+  <div class="card">
+    <div class="bar"><button class="ibtn" id="layClose" aria-label="Fechar"><svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5 5 19"/></svg></button><div class="ttl">Camadas</div></div>
+    <div id="layList"></div>
+    <div id="layFoot"></div>
+  </div>
 </div>
 
 <div id="splash" class="screen splash">

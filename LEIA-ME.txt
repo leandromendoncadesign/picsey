@@ -1,4 +1,4 @@
-PicSey 0.6.1
+PicSey 0.7.0
 
 Estrutura
   index.html              página principal
